@@ -3,8 +3,10 @@
 *note this is research, there are no guarantees*
 
 ## How to use
-`include("QGA.jl")`
-`QGA.minimize(f, mu, sd, s)`
+```
+include("QGA.jl")
+`QGA.minimize(f, mu, sd, s)
+```
 * f: An objective function which takes a vector as input 
 * mu: mean of initial distribution (vector)
 * sd: standard deviation of initial distribution (vector)
