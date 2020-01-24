@@ -2,17 +2,20 @@
 
 *note that this is research, there are no guarantees*
 
+This is based on [work](https://arxiv.org/abs/1912.03395) by Jakub Otwinowski and Colin H. LaMont.
+
 ## install
 ```
 using Pkg
-Pkg.add https://github.com/jotwin/qga
+Pkg.add("https://github.com/jotwin/qga")
 ```
 
 ## How to use
 ```
 using QGA
-QGA.minimize(f, mu, sd, s)
+minimize(f, mu, sd, s)
 ```
+
 * f: An objective function which takes a vector as input 
 * mu: mean of initial distribution (vector)
 * sd: standard deviation of initial distribution (vector)
@@ -29,10 +32,9 @@ Output is a dictionary with :halt describing reason for stopping. :DupFit means 
 
 ## example
 ```
-include("QGA.jl")`
 dim = 5
 fd = 2 .^(1:dim)
 fellipse(x) = sum(fd.*x.^2)
-QGA.minimize(fellipse, zeros(dim), ones(dim), sdmin = 0.0, 5.0, n = 512,
+minimize(fellipse, zeros(dim), ones(dim), sdmin = 0.0, 5.0, n = 512,
             FminTarget = 1e-8, trace = 100*dim)
 ```
