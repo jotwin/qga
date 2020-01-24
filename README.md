@@ -1,11 +1,17 @@
 # Quantitative genetic algorithm
 
-*note this is research, there are no guarantees*
+*note that this is research, there are no guarantees*
+
+## install
+```
+using Pkg
+Pkg.add https://github.com/jotwin/qga
+```
 
 ## How to use
 ```
-include("QGA.jl")
-`QGA.minimize(f, mu, sd, s)
+using QGA
+QGA.minimize(f, mu, sd, s)
 ```
 * f: An objective function which takes a vector as input 
 * mu: mean of initial distribution (vector)

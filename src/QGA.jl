@@ -2,7 +2,7 @@ module QGA
 export minimize
 
 using Printf
-using StatsBase
+#using StatsBase
 using Random
 using Statistics
 using LinearAlgebra
@@ -40,25 +40,12 @@ function selection_entropy!(w, k, t, f, fmin)
     end
 end
 
-function recombine!(xnew, x, w, r, xm, mumin, xmin)
-    z2 = sum(abs2, w)
-    z = sum(w)
-    randn!(r)
-    r .= r.*sqrt.(w)/sqrt(z-z2/z)
-    mul!(xnew, x, r)
-    if mumin
-        xnew .+= xmin.*(1-sum(r))
-    else
-        mean!(xm, x, w, dims = 2)
-        xnew .+= xm.*(1-sum(r))
-    end
-end
-
 function minimize(fitness, x, f, w, r, xm, xnew, s, n,
         FminTarget, sdmin, trace, MaxEvals, mumin; evals = 0)
     fmin, fmini = findmin(f)
     beta = 0.1/std(f)
     sd = 0.0
+    dim = size(x, 1)
     local halt
     if trace < Inf
         println("Iteration     Fmin     Beta")
@@ -66,10 +53,11 @@ function minimize(fitness, x, f, w, r, xm, xnew, s, n,
     while true
         beta = selection_entropy!(w, s, beta, f, fmin)
         w .= exp2.(beta.*(fmin.-f))
-        ww = aweights(w)
-        fm = mean(f, ww)
+        z = sum(w)
+        z2 = sum(abs2, w)
+        fm = mapreduce(*, +, f, w)/z
         if sdmin > 0.0
-            sd = std(f, ww, mean=fm, corrected=true)
+            sd = mapreduce((f,w)-> (f-fm)*w, +, f, w)/(z - z2/z)
             if sd < sdmin
                 halt = :sdmin
                 break
@@ -79,7 +67,23 @@ function minimize(fitness, x, f, w, r, xm, xnew, s, n,
             @printf("%9i %1.2e %1.2e\n", 
                     evals, fmin, beta)
         end
-        recombine!(xnew, x, ww, r, xm, mumin, view(x, :, fmini))
+        if mumin
+            xm .= x[:, fmini]
+        else
+            for i = 1:dim
+                xm[i] = 0.0
+                for j = 1:n
+                    xm[i] += x[i, j]*w[j]
+                end
+                xm[i] /= z
+            end
+        end
+        
+        randn!(r)
+        r .= r.*sqrt.(w)/sqrt(z-z2/z)
+        mul!(xnew, x, r)
+        xnew .+= xm.*(1-sum(r))
+
         j = argmin(w)
         f[j] = fitness(xnew)
         x[:, j] .= xnew
@@ -100,7 +104,7 @@ function minimize(fitness, x, f, w, r, xm, xnew, s, n,
         end
     end
     Dict(:fmin => fmin, :halt => halt, :xmin => x[:,fmini],
-         :n => n, :mumin => mumin,
+         :n => n, :mumin => mumin, :sd => sd,
          :evals => evals, :s=> s)
 end
 

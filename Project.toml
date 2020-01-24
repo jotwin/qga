@@ -1,0 +1,4 @@
+name = "QGA"
+uuid = "e419ca97-b720-4547-8cfb-7898e4ab0974"
+authors = ["Jakub Otwinowski <jotwin@gmail.com>"]
+version = "0.1.0"
