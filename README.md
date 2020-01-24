@@ -35,6 +35,6 @@ Output is a dictionary with :halt describing reason for stopping. :DupFit means 
 dim = 5
 fd = 2 .^(1:dim)
 fellipse(x) = sum(fd.*x.^2)
-minimize(fellipse, zeros(dim), ones(dim), sdmin = 0.0, 5.0, n = 512,
+minimize(fellipse, zeros(dim), ones(dim), 5.0, sdmin = 0.0, n = 512,
             FminTarget = 1e-8, trace = 100*dim)
 ```
